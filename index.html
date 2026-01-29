@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forca Divertida 3.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Overlay 1: IDENTIFICAÇÃO (Login) -->
+    <div id="login-overlay" class="overlay">
+        <div class="modal">
+            <h1>BEM-VINDO! 🤡</h1>
+            <p>Como quer ser chamado no ranking?</p>
+            <div class="login-form">
+                <div class="input-group">
+                    <label for="initial-nickname">👤 USUÁRIO</label>
+                    <input type="text" id="initial-nickname" placeholder="Digite seu nome..." maxlength="15">
+                </div>
+                <div class="input-group">
+                    <label for="initial-password">🔒 SENHA</label>
+                    <input type="password" id="initial-password" placeholder="Digite sua senha...">
+                </div>
+                <button id="login-btn" class="select-btn ranking-btn" disabled onclick="confirmNickname()">INICIAR
+                    JOGO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay 2: SELEÇÃO (Temas e Dificuldade) -->
+    <div id="selection-overlay" class="overlay hidden">
+        <div class="modal">
+            <h1 id="modal-title">ESCOLHA O TEMA</h1>
+
+            <div id="theme-selection" class="selection-grid">
+                <button class="select-btn theme-btn" onclick="selectTheme('animais')">🐾 ANIMAIS</button>
+                <button class="select-btn theme-btn" onclick="selectTheme('alimentos')">🍎 ALIMENTOS</button>
+                <button class="select-btn theme-btn" onclick="selectTheme('tecnologia')">💻 TECNOLOGIA</button>
+                <button class="select-btn theme-btn" onclick="selectTheme('paises')">🌎 PAÍSES</button>
+                <button class="select-btn ranking-btn" onclick="toggleRanking(true)">🏆 RANKING</button>
+            </div>
+
+            <div id="difficulty-selection" class="selection-grid hidden">
+                <button class="select-btn easy" onclick="selectDifficulty('easy')">FÁCIL 🟢</button>
+                <button class="select-btn medium" onclick="selectDifficulty('medium')">MÉDIO 🟡</button>
+                <button class="select-btn hard" onclick="selectDifficulty('hard')">DIFÍCIL 🔴</button>
+                <button class="back-link" onclick="backToThemes()">← Voltar aos temas</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay 3: RANKING -->
+    <div id="ranking-overlay" class="overlay hidden">
+        <div class="modal ranking-modal">
+            <h1>TOP 10 CRAQUES 🏆</h1>
+            <div id="ranking-list" class="ranking-list"></div>
+            <button class="action-btn restart-btn" onclick="toggleRanking(false)">FECHAR</button>
+        </div>
+    </div>
+
+    <!-- Overlay 4: FIM DE JOGO -->
+    <div id="save-score-overlay" class="overlay hidden">
+        <div class="modal">
+            <h1 id="end-title">FIM DE JOGO</h1>
+            <p id="end-message"></p>
+            <div class="save-form">
+                <p><strong>Jogador:</strong> <span id="display-player-name"></span></p>
+                <button class="action-btn hint-btn" onclick="saveScore()">SALVAR PONTUAÇÃO</button>
+            </div>
+            <button class="back-link" onclick="closeSaveModal()">Pular por enquanto</button>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <header>
+            <div class="header-left">
+                <span class="badge player-badge" id="player-tag">JOGADOR</span>
+                <span class="badge theme-badge" id="current-theme">TEMA</span>
+                <span class="badge diff-badge" id="current-difficulty">FÁCIL</span>
+            </div>
+            <div class="stats-panel">
+                <div class="score-box">
+                    <span>🏆 PONTOS:</span>
+                    <span id="score">0</span>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="canvas-wrapper">
+                <canvas id="hangmanCanvas" width="350" height="350"></canvas>
+            </div>
+
+            <div class="game-content">
+                <div id="word-display" class="word-display"></div>
+                <div id="hint-area" class="hint-area hidden">
+                    <p>💡 DICA: <span id="hint-text"></span></p>
+                </div>
+                <div id="message" class="message"></div>
+                <div class="controls">
+                    <button id="hint-btn" class="action-btn hint-btn">PEDIR DICA (-10pts)</button>
+                    <button id="restart-btn" class="action-btn restart-btn">TEMAS</button>
+                </div>
+                <div id="keyboard" class="keyboard"></div>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
