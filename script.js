@@ -78,8 +78,6 @@ const gameData = {
 let currentSelectedTheme = null;
 let currentSelectedDifficulty = 'easy';
 let playerName = "";
-const API_URL = 'http://localhost:3000/api';
-
 const normalize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
 const themeMap = { animais: '🐾 ANIMAIS', alimentos: '🍎 ALIMENTOS', tecnologia: '💻 TECNOLOGIA', paises: '🌎 PAÍSES' };
 
@@ -498,28 +496,44 @@ function closeSaveModal() {
     document.getElementById('save-score-overlay').classList.add('hidden');
 }
 
+// Local Storage Keys
+const STORAGE_KEY = 'hangman_rankings';
+
 async function saveScore() {
     if (!playerName) return alert("Erro: Nickname não encontrado!");
 
+    const newScore = {
+        name: playerName,
+        score: game.score,
+        theme: themeMap[currentSelectedTheme],
+        difficulty: currentSelectedDifficulty,
+        date: new Date().toISOString()
+    };
+
     try {
-        const response = await fetch(`${API_URL}/score`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: playerName,
-                score: game.score,
-                theme: themeMap[currentSelectedTheme],
-                difficulty: currentSelectedDifficulty
-            })
-        });
-        if (response.ok) {
-            alert("Pontuação salva com sucesso!");
-            closeSaveModal();
-            toggleRanking(true);
-        }
+        // 1. Get existing rankings
+        const existingData = localStorage.getItem(STORAGE_KEY);
+        let rankings = existingData ? JSON.parse(existingData) : [];
+
+        // 2. Add new score
+        rankings.push(newScore);
+
+        // 3. Sort by score (descending)
+        rankings.sort((a, b) => b.score - a.score);
+
+        // 4. Keep only top 10
+        rankings = rankings.slice(0, 10);
+
+        // 5. Save back to Local Storage
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(rankings));
+
+        alert("Pontuação salva com sucesso (Local)!");
+        closeSaveModal();
+        toggleRanking(true);
+
     } catch (err) {
-        console.error("Erro ao salvar:", err);
-        alert("Erro ao conectar com o servidor.");
+        console.error("Erro ao salvar localmente:", err);
+        alert("Erro ao salvar pontuação.");
     }
 }
 
@@ -529,9 +543,12 @@ async function toggleRanking(show) {
         overlay.classList.remove('hidden');
         const list = document.getElementById('ranking-list');
         list.innerHTML = "Carregando...";
+
         try {
-            const response = await fetch(`${API_URL}/ranking`);
-            const data = await response.json();
+            // Read from Local Storage
+            const existingData = localStorage.getItem(STORAGE_KEY);
+            const data = existingData ? JSON.parse(existingData) : [];
+
             list.innerHTML = data.map((item, i) => `
                 <div class="ranking-item">
                     <span>${i + 1}. ${item.name}</span>
@@ -539,6 +556,7 @@ async function toggleRanking(show) {
                 </div>
             `).join('') || "Nenhuma pontuação registrada ainda.";
         } catch (err) {
+            console.error(err);
             list.innerHTML = "Erro ao carregar ranking.";
         }
     } else {
